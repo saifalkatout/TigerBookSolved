@@ -1,0 +1,21 @@
+EXERCISE 1 
+
+	a) /(a[ab]*)*c*
+	b) /^(?:[^a]*a){5}([bc]*)$
+	c) (1)00(0)*
+	d) ^(?:111[01][01]1|1[01]11[01]1|1[01]1[01]11|101001([01]+))  // one of the nicest questions
+	e) ^(?![abc]*baa)[abc]*$
+	f) ^(?:0[A-F0-9]*|[0-9]*)
+	g) a^n + b^n = (a+b)^n --> solve by summing using binomial (out of scope)
+
+EXERCISE 2 
+	a) This requires conditional computation, since the number of As allowed changes based on the number of Bs in the input text
+	b) This requires conditional computation, since the second half of the text must match the string reverse of the first half of the input text
+	c) The ML (Meta Language) family of programming languages, which includes Standard ML (SML) and OCaml, is not a regular language according to formal language theory. 
+
+EXERCISE 3
+	a) All 4 digits binary numbers except 0110
+	b) the regular expression => a[aaaa]*
+	c) A binary number that has every 0 outside of the parenthesis 10 01 and every 1 inside
+
+EXECRISES (4 - 9) => Attached sol.png
