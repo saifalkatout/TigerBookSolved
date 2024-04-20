@@ -63,9 +63,7 @@ type     => (Tokens.TYPE(yypos,yypos+4));
 
 {QUOTE}{NONQUOTE}*{QUOTE} => (Tokens.STRING(yytext,yypos,yypos+size yytext));
 {IDENTIFIER} => (Tokens.ID(yytext,yypos,yypos+size yytext));
-{DIGIT}      => (Tokens.INT(case Int.fromString yytext of
-    NONE => 0
-  | SOME num =>  num,  yypos,yypos+size yytext));
+{DIGIT}      => (Tokens.INT(valOf(Int.fromString(yytext)),yypos,yypos+size yytext));
 {COMMENT}    => (continue());
 {SPACE}      => (continue());
 .            => (ErrorMsg.error yypos ("illegal character " ^ yytext); continue());
