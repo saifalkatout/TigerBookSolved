@@ -30,6 +30,10 @@
 %value INT (1)
 %value STRING ("")
 
+%left AND OR
+%nonassoc EQ NEQ LT GT LE GE
+%left PLUS MINUS
+
 %%
 
 (* This is a skeleton grammar file, meant to illustrate what kind of
