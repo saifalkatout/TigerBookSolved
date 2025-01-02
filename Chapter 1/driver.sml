@@ -77,8 +77,8 @@ fun interpExp(tb: table, NumExp(v)) = v
     end
   | interpExp(tb: table, IdExp(v)) = lookup(tb, v)
 
-and interpStm(tb:table, CompoundStm(l, r)) = (interpStm(interpStm(tb, l), r))
-| interpStm(tb:table, AssignStm(id ,exp)) = update(tb, id, interpExp(tb, exp))
-| interpStm(tb:table, PrintStm(exp::exps)) = (print_exp(exp); if exps = [] then (print ("\n"); tb) else (interpStm(tb, PrintStm(exps)); tb));
+and interpStm(tb:table, CompoundStm(l, r)) = interpStm(tb, l) + interpStm(tb, r)
+| interpStm(tb:table, AssignStm(id ,exp)) = interpExp(tb, exp)
+| interpStm(tb:table, PrintStm(exp::exps)) = (print_exp(exp); if exps = [] then (print ("\n"); 0) else interpStm(tb, PrintStm(exps)));
 
 interpStm([], prog);

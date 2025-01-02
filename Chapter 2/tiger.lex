@@ -8,16 +8,37 @@ fun err(p1,p2) = ErrorMsg.error p1
 fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
 
 
-%%
-DIGIT=[0-9]+;
-COMMENT=\/\*.*\*\/;
-SPACE=[\ \t\b\f\r]+;
-IDENTIFIER=[a-zA-Z][a-zA-Z0-9]*;
-QUOTE=[\"];
-NONQUOTE=[^\"];
+fun replaceAll (source, target, replacement) =
+    let
+        val lenTarget = String.size target
+        fun replaceHelper s =
+            if String.size s < lenTarget then s
+            else if String.substring (s, 0, lenTarget) = target then
+                replacement ^ replaceHelper (String.substring (s, lenTarget, String.size s - lenTarget))
+            else
+                String.str (String.sub (s, 0)) ^ replaceHelper (String.extract (s, 1, NONE))
+    in
+        replaceHelper source
+    end;
 
+(*   ))) *)
+fun cleanString (source): string  = (replaceAll (replaceAll (replaceAll (replaceAll (source, "\\t", "\t"), "\\n", "\n"), "\\\"", "\""), "\\\\", "\\"));
+
+(* "/*" => (YYBEGIN COMMENT; continue());
+<COMMENT>"*/" => (YYBEGIN INITIAL; continue());
+<COMMENT>.  => (continue()); *)
+%% 
+%s COMMENT;
+COMMENT=\/\*(.|\n)*\*\/ ;
 %%
+
 \n	=> (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
+","	=> (Tokens.COMMA(yypos,yypos+1));
+[0-9]+	=> (Tokens.INT(Option.getOpt (Int.fromString yytext, 0),yypos,yypos+ size yytext));
+[a-z]([a-z0-9]|_)*  => (Tokens.ID(yytext, yypos, yypos + size yytext));
+\".*\"  => (Tokens.STRING(cleanString yytext, yypos, yypos + size yytext));
+"=" => (Tokens.ASSIGN(yypos, yypos + 1));
+(" "|\t|\f) => (continue());
 
 "+"     => (Tokens.PLUS(yypos,yypos+1));
 "-"     => (Tokens.MINUS(yypos,yypos+1));
@@ -60,10 +81,7 @@ then     => (Tokens.THEN(yypos,yypos+4));
 if       => (Tokens.IF(yypos,yypos+2));
 array    => (Tokens.ARRAY(yypos,yypos+5));
 type     => (Tokens.TYPE(yypos,yypos+4));
-
-{QUOTE}{NONQUOTE}*{QUOTE} => (Tokens.STRING(yytext,yypos,yypos+size yytext));
-{IDENTIFIER} => (Tokens.ID(yytext,yypos,yypos+size yytext));
-{DIGIT}      => (Tokens.INT(valOf(Int.fromString(yytext)),yypos,yypos+size yytext));
 {COMMENT}    => (continue());
-{SPACE}      => (continue());
-.            => (ErrorMsg.error yypos ("illegal character " ^ yytext); continue());
+"/*" => (ErrorMsg.error yypos ("Unclosed comment "); continue());
+
+.       => (ErrorMsg.error yypos ("illegal character " ^ yytext); continue());
